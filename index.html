@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="preload" as="image" href="autoload/Hero.webp" fetchpriority="high">
+  <link rel="preload" as="image" href="autoload/Hero.jpg" fetchpriority="high">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_back,arrow_upward,chevron_left,chevron_right,close,search&display=swap" rel="stylesheet">
   <script src="assets/js/components.js"></script>
@@ -55,7 +55,7 @@
   <!-- ─── HERO · imagem full-bleed que desliza para o lado revelando o título ─── -->
   <section id="hero-viewport" class="hero-split">
     <div id="hero-sticky">
-      <div id="hero-bg" class="hero-media" style="background-image: url('autoload/Hero.webp');"></div>
+      <div id="hero-bg" class="hero-media" style="background-image: url('autoload/Hero.jpg');"></div>
       <span class="hero-wordmark" aria-hidden="true" translate="no">Pisos Pinho de Riga</span>
       <div id="hero-content" class="hero-copy">
         <span class="hero-eyebrow">Coleção 2026</span>
@@ -267,8 +267,16 @@
               <div class="floor-face floor-edge floor-edge-f"></div>
               <div class="floor-face floor-edge floor-edge-l"></div>
               <div class="floor-face floor-edge floor-edge-r"></div>
-              <!-- encaixe: só a fêmea (rebaixo recuado PARA DENTRO) na borda traseira.
-                   Sem lingueta projetada = sem z-fighting no preserve-3d, gira livre. -->
+              <!-- encaixe macho×fêmea igual à régua: junta no MEIO da espessura,
+                   macho na borda frontal (+Y) e fêmea na borda traseira (-Y), alinhados. -->
+              <!-- MACHO (lingueta): projeta-se À FRENTE da face floor-edge-f, que
+                   continua fechando os ombros -> sem faces coplanares = gira sem z-fighting. -->
+              <div class="floor-face floor-tongue floor-tongue-front"></div>
+              <div class="floor-face floor-tongue floor-tongue-top"></div>
+              <div class="floor-face floor-tongue floor-tongue-bot"></div>
+              <div class="floor-face floor-tongue floor-tongue-cap floor-tongue-cap-l"></div>
+              <div class="floor-face floor-tongue floor-tongue-cap floor-tongue-cap-r"></div>
+              <!-- FÊMEA (rebaixo recuado PARA DENTRO) na borda traseira: dois lábios + interior. -->
               <div class="floor-face floor-edge floor-groove-lip floor-groove-lip-up"></div>
               <div class="floor-face floor-edge floor-groove-lip floor-groove-lip-lo"></div>
               <div class="floor-face floor-groove floor-groove-inner"></div>
@@ -345,15 +353,18 @@
     </ul>
 
     <div class="mtipos-footer">
-      <h4g>Ideal para</h4>
+      <h4>Ideal para</h4>
       <p>Residências e projetos de alto padrão que exigem máxima estabilidade.</p>
     </div>
 
   </article>
 
 </div>
-      <p class="mtipos-outro fade-up">O resultado é um piso que mantém a elegância da madeira maciça, mas com desempenho
-        superior, oferecendo mais segurança, conforto e estabilidade para o dia a dia.</p>
+      <!-- Fecho da seção, em bloco destacado -->
+      <div class="mtipos-fecho fade-up">
+        <p class="mtipos-outro">O resultado é um piso que mantém a elegância da madeira maciça, mas com desempenho
+          superior, oferecendo mais segurança, conforto e estabilidade para o dia a dia.</p>
+      </div>
 
       <!-- Bloco final: como a madeira reage -->
       <div class="mtipos-react">

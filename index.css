@@ -1011,6 +1011,8 @@
   --ink-40: rgba(0, 0, 0, .38);
   --ink-10: rgba(0, 0, 0, .1);
   --accent: #9a6638;
+  /* lavagem quente derivada do accent, para o bloco de fecho */
+  --fecho-bg: rgba(154, 102, 56, .06);
   position: relative;
   z-index: 21;
   background: var(--branco);
@@ -1095,12 +1097,28 @@
   --w: clamp(240px, 60vw, 460px);
   --h: calc(var(--w) * 0.6);
   --t: clamp(30px, 7vw, 48px);
-  /* perfil macho-fêmea (encaixe): altura da junta, projeção da lingueta,
-     profundidade do rebaixo e altura de cada lábio da fêmea */
-  --jt: calc(var(--t) * 0.34);
-  --tp: clamp(7px, 1.6vw, 12px);
-  --gd: calc(var(--tp) + 7px);
-  --lh: calc((var(--t) - var(--jt)) / 2);
+  /* perfil macho-fêmea (encaixe) — proporções da régua de referência
+     (junta ≈ 1/3 da espessura, no meio; projeção do macho ≈ 2× a junta;
+     rebaixo da fêmea um pouco mais fundo que a projeção, para dar folga) */
+  --jt: calc(var(--t) * 0.32);            /* altura da junta (macho e fêmea) */
+  --lh: calc((var(--t) - var(--jt)) / 2); /* altura de cada ombro/lábio */
+  --tp: calc(var(--jt) * 1.35);           /* projeção do macho para fora */
+  --gd: calc(var(--tp) * 1.4);            /* profundidade do rebaixo da fêmea */
+
+  /* ── textura do corte: lâminas do miolo desenhadas com gradiente ──
+     Nítidas em qualquer tamanho (a foto sozinha ficava esmagada e lavada).
+     Uma lâmina = faixa clara + faixa escura + linha de cola, repetidas. */
+  --ply: calc(var(--t) * .105);           /* espessura de cada lâmina */
+  --ply-stops:
+    rgba(236, 203, 152, .62) 0,
+    rgba(236, 203, 152, .62) calc(var(--ply) * .46),
+    rgba(150, 98, 49, .50) calc(var(--ply) * .46),
+    rgba(150, 98, 49, .50) calc(var(--ply) - 1.2px),
+    rgba(52, 29, 11, .70) calc(var(--ply) - 1.2px),
+    rgba(52, 29, 11, .70) var(--ply);
+  /* mesma pilha em duas direções: atravessa a espessura em cada face */
+  --plies-v: repeating-linear-gradient(180deg, var(--ply-stops));
+  --plies-h: repeating-linear-gradient(90deg, var(--ply-stops));
   perspective: 1600px;
   width: var(--w);
   height: var(--h);
@@ -1140,7 +1158,15 @@
   width: var(--w);
   height: var(--h);
   transform: translate(-50%, -50%) translateZ(calc(var(--t) / 2));
-  background-image: linear-gradient(rgba(0, 0, 0, .04), rgba(0, 0, 0, .04)), url('tecnologia/madeira-01.webp');
+  /* brilho suave do acabamento (Verniz UV / Laca OIL) por cima do veio */
+  background-image: linear-gradient(112deg,
+      rgba(255, 248, 235, .16) 8%,
+      rgba(255, 248, 235, .03) 34%,
+      rgba(0, 0, 0, .07) 72%,
+      rgba(0, 0, 0, .13) 100%),
+    url('tecnologia/madeira-01.webp');
+  background-size: cover, cover;
+  background-position: center, center;
   background-color: #8a4a2a;
   border-radius: 2px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
@@ -1151,63 +1177,54 @@
   width: var(--w);
   height: var(--h);
   transform: translate(-50%, -50%) translateZ(calc(var(--t) / -2)) rotateX(180deg);
-  background-image: linear-gradient(rgba(22, 13, 7, .55), rgba(22, 13, 7, .55)), url('tecnologia/madeira-03.jpg');
+  /* era madeira-03.jpg (404) — a base ficava sem textura, só cor chapada */
+  background-image: linear-gradient(rgba(22, 13, 7, .5), rgba(22, 13, 7, .5)), url('tecnologia/madeira-03.webp');
+  background-size: cover;
+  background-position: center;
   background-color: #4a3020;
 }
 
-/* bordas laterais — foto real do corte do piso engenheirado (lâminas do compensado).
-   A textura vai num ::before para poder ser girada 90° nas faces laterais,
-   mantendo as lâminas sempre atravessando a espessura. */
+/* bordas laterais — corte real do piso engenheirado.
+   As lâminas do miolo vêm do gradiente (--plies-*), sempre nítidas; a foto do
+   compensado entra por baixo só como grão/variação de cor. A direção do
+   gradiente muda por face para as lâminas SEMPRE atravessarem a espessura. */
 #madeiras-tipos .floor-edge {
   overflow: hidden;
- 
-  box-shadow: inset 0 0 22px rgba(0, 0, 0, .3),
-    inset 0 1px 0 rgba(255, 255, 255, .1);
-      background-image: url('tecnologia/borda-engenheirado.webp');
-       background-position: center;
-  background-size: 100% 260%;
+  background-color: #a8845a;
+  background-repeat: repeat, no-repeat;
+  background-position: center, center;
+  /* sombra de contato nas quinas + leve luz na aresta de cima */
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, .26),
+    inset 0 1px 0 rgba(255, 255, 255, .13);
 }
 
-#madeiras-tipos .floor-edge::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  background-image: url('tecnologia/borda-engenheirado.webp');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 260%;
-}
-
-/* faces frontal/traseira: lâminas na horizontal (imagem sem girar) */
+/* faces frontal/traseira: lâminas empilhadas de cima para baixo */
 #madeiras-tipos .floor-edge-f {
   width: var(--w);
   height: var(--t);
   transform: translate(-50%, -50%) rotateX(-90deg) translateZ(calc(var(--h) / 2));
+  background-image: var(--plies-v), url('tecnologia/borda-engenheirado.webp');
+  background-size: auto, cover;
   filter: brightness(1.02);
-
 }
 
-/* faces esquerda/direita: imagem girada 90° para as lâminas atravessarem a espessura */
+/* faces esquerda/direita: mesma pilha girada 90° (atravessa a largura da face) */
 #madeiras-tipos .floor-edge-l {
   width: var(--t);
   height: var(--h);
   transform: translate(-50%, -50%) rotateY(-90deg) translateZ(calc(var(--w) / 2));
-  filter: brightness(.82);
+  background-image: var(--plies-h), url('tecnologia/borda-engenheirado.webp');
+  background-size: auto, cover;
+  filter: brightness(.84) saturate(1.05);
 }
 
 #madeiras-tipos .floor-edge-r {
   width: var(--t);
   height: var(--h);
   transform: translate(-50%, -50%) rotateY(90deg) translateZ(calc(var(--w) / 2));
-  filter: brightness(.92);
-}
-
-#madeiras-tipos .floor-edge-l::before,
-#madeiras-tipos .floor-edge-r::before {
-  width: var(--h);
-  height: var(--t);
-  transform: translate(-50%, -50%) rotate(90deg);
+  background-image: var(--plies-h), url('tecnologia/borda-engenheirado.webp');
+  background-size: auto, cover;
+  filter: brightness(.93) saturate(1.02);
 }
 
 /* capa nobre — faixa de madeira do topo, um pouco mais grossa que as lâminas
@@ -1215,61 +1232,126 @@
 #madeiras-tipos .floor-edge::after {
   content: "";
   position: absolute;
-  background-image: linear-gradient(rgba(255, 255, 255, .04), rgba(0, 0, 0, .16)),
+  background-image: linear-gradient(rgba(255, 236, 210, .10), rgba(0, 0, 0, .20)),
     url('tecnologia/madeira-01.webp');
   background-size: cover;
   background-position: center;
 }
 
+/* ~22% da espessura = camada nobre de ≈3,3mm numa régua de 15,08mm */
 #madeiras-tipos .floor-edge-f::after {
   left: 0;
   right: 0;
   top: 0;
-  height: 17%;
-  border-bottom: 1.5px solid rgba(34, 18, 8, .75);
+  height: 22%;
+  border-bottom: 1.5px solid rgba(30, 15, 6, .8);
 }
 
 #madeiras-tipos .floor-edge-l::after {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 17%;
-  border-left: 1.5px solid rgba(34, 18, 8, .75);
+  width: 22%;
+  border-left: 1.5px solid rgba(30, 15, 6, .8);
 }
 
 #madeiras-tipos .floor-edge-r::after {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 17%;
-  border-right: 1.5px solid rgba(34, 18, 8, .75);
+  width: 22%;
+  border-right: 1.5px solid rgba(30, 15, 6, .8);
 }
 
-/* ---- MACHO (lingueta) removido: em vez de projetar para fora (+Y) — o que
-   causava z-fighting no preserve-3d em ângulo rasante (a lingueta "soltava"
-   no canto) — a borda frontal fica lisa (floor-edge-f) e o único encaixe é a
-   fêmea recuada PARA DENTRO na borda traseira. Peça quase convexa = gira sem bug. ---- */
+/* ---- MACHO (lingueta) — projeta-se PARA FORA (+Y) na borda frontal, no meio
+   da espessura, alinhado com a fêmea da borda oposta. Fica À FRENTE da face
+   floor-edge-f (que continua fechando os ombros acima/abaixo da lingueta), então
+   não há duas faces coplanares disputando o mesmo plano — gira sem z-fighting. ---- */
+#madeiras-tipos .floor-tongue {
+  overflow: hidden;
+  background-color: #a8845a;
+  background-repeat: repeat, no-repeat;
+  background-position: center, center;
+  background-image: url('tecnologia/borda-engenheirado.webp');
+  background-size: cover;
+}
+
+/* ponta da lingueta — face frontal vertical: corte, mostra as lâminas */
+#madeiras-tipos .floor-tongue-front {
+  width: var(--w);
+  height: var(--jt);
+  transform: translate(-50%, -50%) rotateX(-90deg) translateZ(calc(var(--h) / 2 + var(--tp)));
+  background-image: var(--plies-v), url('tecnologia/borda-engenheirado.webp');
+  background-size: auto, cover;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, .3);
+}
+
+/* faces superior e inferior da lingueta (planos horizontais entre o ombro e a ponta) */
+#madeiras-tipos .floor-tongue-top {
+  width: var(--w);
+  height: var(--tp);
+  transform: translate(-50%, -50%) translateY(calc(var(--h) / 2 + var(--tp) / 2)) translateZ(calc(var(--jt) / 2));
+  filter: brightness(.92);
+}
+
+#madeiras-tipos .floor-tongue-bot {
+  width: var(--w);
+  height: var(--tp);
+  transform: translate(-50%, -50%) translateY(calc(var(--h) / 2 + var(--tp) / 2)) translateZ(calc(var(--jt) / -2)) rotateX(180deg);
+  filter: brightness(.7);
+}
+
+/* tampas das pontas da lingueta (x = ±W/2) para não vazar nos cantos */
+#madeiras-tipos .floor-tongue-cap {
+  width: var(--jt);
+  height: var(--tp);
+  backface-visibility: visible;
+  /* aqui a espessura corre na horizontal: lâminas giradas 90° */
+  background-image: var(--plies-h), url('tecnologia/borda-engenheirado.webp');
+  background-size: auto, cover;
+  filter: brightness(.8);
+}
+
+#madeiras-tipos .floor-tongue-cap-l {
+  transform: translate(-50%, -50%) translateX(calc(var(--w) / -2)) translateY(calc(var(--h) / 2 + var(--tp) / 2)) rotateY(90deg);
+}
+
+#madeiras-tipos .floor-tongue-cap-r {
+  transform: translate(-50%, -50%) translateX(calc(var(--w) / 2)) translateY(calc(var(--h) / 2 + var(--tp) / 2)) rotateY(-90deg);
+}
 
 /* ---- FÊMEA (encaixe) — rebaixo na borda traseira (-Y): dois lábios + interior ----
    Corre ao longo do comprimento (X); a fenda abre no meio da espessura (Z),
    recuando para dentro (+Y). Fica na face traseira, oposta ao macho. */
-/* lábios: reaproveitam a foto do compensado (como as demais bordas) */
+/* lábios: mesmas lâminas das demais bordas (antes eram marrom chapado) */
 #madeiras-tipos .floor-groove-lip {
   width: var(--w);
   height: var(--lh);
-  background: #7c5230;
+  background-image: var(--plies-v), url('tecnologia/borda-engenheirado.webp');
+  background-size: auto, cover;
   filter: brightness(.8);
 }
 
-#madeiras-tipos .floor-groove-lip::before {
-  width: 100%;
-  height: 100%;
-  background-size: 100% 800%;
-  transform: translate(-50%, -50%);
+/* o lábio de baixo é o fundo da régua: não leva camada nobre */
+#madeiras-tipos .floor-groove-lip-lo::after {
+  content: none;
 }
 
-#madeiras-tipos .floor-groove-lip::after {
-  content: none;
+/* o lábio de cima ainda é a superfície da régua: leva a camada nobre, como as
+   demais bordas — senão o lado da fêmea parecia que a madeira nobre acabava.
+   O rotateX(90deg) inverte o eixo, por isso a faixa vai em bottom (= topo real). */
+#madeiras-tipos .floor-groove-lip-up::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--t) * .22);
+  background-image: linear-gradient(rgba(0, 0, 0, .20), rgba(255, 236, 210, .10)),
+    url('tecnologia/madeira-01.webp');
+  background-size: cover;
+  background-position: center;
+  border-top: 1.5px solid rgba(30, 15, 6, .8);
 }
 
 #madeiras-tipos .floor-groove-lip-up {
@@ -1403,16 +1485,25 @@
   content: "";
   position: absolute;
   left: 0;
-  top: .62em;
-  width: 6px;
-  height: 1px;
-  background: var(--ink-40);
+  top: .58em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
-/* Fecho */
+/* Fecho — bloco destacado que encerra a seção */
+#madeiras-tipos .mtipos-fecho {
+  max-width: 54rem;
+  margin: clamp(3rem, 5vw, 4.5rem) 0 0;
+  padding: clamp(1.75rem, 3vw, 2.5rem) clamp(1.75rem, 3.5vw, 2.75rem);
+  background: var(--fecho-bg);
+  border-left: 2px solid var(--accent);
+  border-radius: 3px;
+}
+
 #madeiras-tipos .mtipos-outro {
-  max-width: 44rem;
-  margin: clamp(2.5rem, 4vw, 3.5rem) 0 0;
+  margin: 0;
   font-size: var(--text-body);
   font-weight: 300;
   line-height: 1.75;
